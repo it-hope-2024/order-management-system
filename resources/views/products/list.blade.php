@@ -27,6 +27,29 @@
 <x-table-layout title="Product List">
     
     <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Product List</h1>
+            <a href="{{ route('products.create') }}" class="btn btn-success">Create Product</a>
+        </div>
+        <table class="table table-bordered data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name En</th>
+                    <th>Name Ar</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</x-table-layout>
+{{-- <body>
+    
+    <div class="container mt-4">
         <h1>Product List</h1>
     
         <table class="table table-bordered data-table">
@@ -44,7 +67,7 @@
         </table>
     </div>
 
-</x-table-layout>
+</body> --}}
 
 <script type="text/javascript">
     $(function () {
@@ -98,6 +121,28 @@
             });
         @endif
     });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Check if success message is stored in sessionStorage
+        let successMessage = sessionStorage.getItem('successMessage');
+        if (successMessage) {
+            Swal.fire({
+                toast: true,
+                position: 'bottom-end',
+                icon: 'success',
+                title: successMessage,
+                showConfirmButton: false,
+                timer: 3000
+            });
+            sessionStorage.removeItem('successMessage'); // Clear message after displaying
+        }
+    });
+
+    // Before redirecting, store success message
+    @if(session('success'))
+        sessionStorage.setItem('successMessage', "{{ session('success') }}");
+    @endif
 </script>
 
 

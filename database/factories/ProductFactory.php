@@ -22,51 +22,53 @@ class ProductFactory extends Factory
      */
     protected $model = Product::class;
 
+    public static array $productNames = [
+        ['en' => 'Laptop', 'ar' => 'لابتوب'],
+        ['en' => 'Smartphone', 'ar' => 'هاتف ذكي'],
+        ['en' => 'Tablet', 'ar' => 'جهاز لوحي'],
+        ['en' => 'Headphones', 'ar' => 'سماعات'],
+        ['en' => 'Camera', 'ar' => 'كاميرا'],
+        ['en' => 'Smartwatch', 'ar' => 'ساعة ذكية'],
+        ['en' => 'Monitor', 'ar' => 'شاشة'],
+        ['en' => 'Keyboard', 'ar' => 'لوحة مفاتيح'],
+        ['en' => 'Mouse', 'ar' => 'فأرة'],
+        ['en' => 'Printer', 'ar' => 'طابعة'],
+        ['en' => 'Scanner', 'ar' => 'ماسح ضوئي'],
+        ['en' => 'Speakers', 'ar' => 'مكبرات صوت'],
+        ['en' => 'External Hard Drive', 'ar' => 'قرص صلب خارجي'],
+        ['en' => 'USB Flash Drive', 'ar' => 'محرك أقراص فلاش USB'],
+        ['en' => 'Wireless Charger', 'ar' => 'شاحن لاسلكي'],
+        ['en' => 'Gaming Console', 'ar' => 'وحدة تحكم ألعاب'],
+        ['en' => 'Graphics Card', 'ar' => 'بطاقة رسومات'],
+        ['en' => 'Router', 'ar' => 'راوتر'],
+        ['en' => 'Power Bank', 'ar' => 'بنك طاقة'],
+        ['en' => 'VR Headset', 'ar' => 'نظارة واقع افتراضي'],
+        ['en' => 'Microphone', 'ar' => 'ميكروفون'],
+        ['en' => 'Projector', 'ar' => 'جهاز عرض'],
+        ['en' => 'Smart TV', 'ar' => 'تلفاز ذكي'],
+        ['en' => 'E-Reader', 'ar' => 'قارئ إلكتروني'],
+        ['en' => 'Bluetooth Speaker', 'ar' => 'مكبر صوت بلوتوث'],
+        ['en' => 'Drone', 'ar' => 'طائرة بدون طيار'],
+        ['en' => 'Fitness Tracker', 'ar' => 'متعقب اللياقة البدنية'],
+        ['en' => 'Desktop Computer', 'ar' => 'كمبيوتر مكتبي'],
+        ['en' => 'Smart Home Hub', 'ar' => 'مركز تحكم ذكي'],
+        ['en' => 'Wireless Earbuds', 'ar' => 'سماعات أذن لاسلكية'],
+        ['en' => 'Car Charger', 'ar' => 'شاحن سيارة'],
+        ['en' => 'Cooling Pad', 'ar' => 'لوحة تبريد'],
+        ['en' => 'Memory Card', 'ar' => 'بطاقة ذاكرة'],
+        ['en' => 'Portable SSD', 'ar' => 'قرص SSD محمول'],
+        ['en' => 'HDMI Cable', 'ar' => 'كابل HDMI'],
+        ['en' => 'Mechanical Keyboard', 'ar' => 'لوحة مفاتيح ميكانيكية'],
+        ['en' => 'Ergonomic Mouse', 'ar' => 'فأرة مريحة'],
+        ['en' => 'Surge Protector', 'ar' => 'واقي من التيار المتغير'],
+        ['en' => 'Webcam', 'ar' => 'كاميرا ويب']
+    ];
+
+
     public function definition(): array
     {
-        $productNames = [
-            ['en' => 'Laptop', 'ar' => 'لابتوب'],
-            ['en' => 'Smartphone', 'ar' => 'هاتف ذكي'],
-            ['en' => 'Tablet', 'ar' => 'جهاز لوحي'],
-            ['en' => 'Headphones', 'ar' => 'سماعات'],
-            ['en' => 'Camera', 'ar' => 'كاميرا'],
-            ['en' => 'Smartwatch', 'ar' => 'ساعة ذكية'],
-            ['en' => 'Monitor', 'ar' => 'شاشة'],
-            ['en' => 'Keyboard', 'ar' => 'لوحة مفاتيح'],
-            ['en' => 'Mouse', 'ar' => 'فأرة'],
-            ['en' => 'Printer', 'ar' => 'طابعة'],
-            ['en' => 'Scanner', 'ar' => 'ماسح ضوئي'],
-            ['en' => 'Speakers', 'ar' => 'مكبرات صوت'],
-            ['en' => 'External Hard Drive', 'ar' => 'قرص صلب خارجي'],
-            ['en' => 'USB Flash Drive', 'ar' => 'محرك أقراص فلاش USB'],
-            ['en' => 'Wireless Charger', 'ar' => 'شاحن لاسلكي'],
-            ['en' => 'Gaming Console', 'ar' => 'وحدة تحكم ألعاب'],
-            ['en' => 'Graphics Card', 'ar' => 'بطاقة رسومات'],
-            ['en' => 'Router', 'ar' => 'راوتر'],
-            ['en' => 'Power Bank', 'ar' => 'بنك طاقة'],
-            ['en' => 'VR Headset', 'ar' => 'نظارة واقع افتراضي'],
-            ['en' => 'Microphone', 'ar' => 'ميكروفون'],
-            ['en' => 'Projector', 'ar' => 'جهاز عرض'],
-            ['en' => 'Smart TV', 'ar' => 'تلفاز ذكي'],
-            ['en' => 'E-Reader', 'ar' => 'قارئ إلكتروني'],
-            ['en' => 'Bluetooth Speaker', 'ar' => 'مكبر صوت بلوتوث'],
-            ['en' => 'Drone', 'ar' => 'طائرة بدون طيار'],
-            ['en' => 'Fitness Tracker', 'ar' => 'متعقب اللياقة البدنية'],
-            ['en' => 'Desktop Computer', 'ar' => 'كمبيوتر مكتبي'],
-            ['en' => 'Smart Home Hub', 'ar' => 'مركز تحكم ذكي'],
-            ['en' => 'Wireless Earbuds', 'ar' => 'سماعات أذن لاسلكية'],
-            ['en' => 'Car Charger', 'ar' => 'شاحن سيارة'],
-            ['en' => 'Cooling Pad', 'ar' => 'لوحة تبريد'],
-            ['en' => 'Memory Card', 'ar' => 'بطاقة ذاكرة'],
-            ['en' => 'Portable SSD', 'ar' => 'قرص SSD محمول'],
-            ['en' => 'HDMI Cable', 'ar' => 'كابل HDMI'],
-            ['en' => 'Mechanical Keyboard', 'ar' => 'لوحة مفاتيح ميكانيكية'],
-            ['en' => 'Ergonomic Mouse', 'ar' => 'فأرة مريحة'],
-            ['en' => 'Surge Protector', 'ar' => 'واقي من التيار المتغير'],
-            ['en' => 'Webcam', 'ar' => 'كاميرا ويب']
-        ];
-
-        $randomProduct = $this->faker->randomElement($productNames);
+        
+        $randomProduct = $this->faker->unique()->randomElement(self::$productNames);
 
         return [
             'name' => [
