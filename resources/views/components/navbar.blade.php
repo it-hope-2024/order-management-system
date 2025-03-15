@@ -77,7 +77,7 @@
                     <div class="relative inline-block text-left">
                         <button id="dropdownButton" data-dropdown-toggle="languageDropdown"
                             class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('messages.language') }} 
+                             {{ __('messages.language') }}:{{ LaravelLocalization::getCurrentLocaleNative() }} 
                             
                             <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                                 aria-hidden="true">
