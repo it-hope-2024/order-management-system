@@ -34,7 +34,7 @@
 
             <div class="mb-3">
                 <label for="price" class="form-label">Price</label>
-                <input type="number" step="0.01" class="form-control @error('price') is-invalid @enderror" id="price" name="price" value="{{ old('price', $product->price) }}">
+                <input type="number" step="0.01"  class="form-control @error('price') is-invalid @enderror" id="price" name="price" value="{{ old('price', $product->price) }}">
                 @error('price')
                     <div class="text-danger">{{ $message }}</div>
                 @enderror
@@ -42,7 +42,7 @@
 
             <div class="mb-3">
                 <label for="stock" class="form-label">Stock</label>
-                <input type="number" class="form-control @error('stock') is-invalid @enderror" id="stock" name="stock" value="{{ old('stock', $product->stock) }}">
+                <input type="number"  class="form-control @error('stock') is-invalid @enderror" id="stock" name="stock" value="{{ old('stock', $product->stock) }}">
                 @error('stock')
                     <div class="text-danger">{{ $message }}</div>
                 @enderror

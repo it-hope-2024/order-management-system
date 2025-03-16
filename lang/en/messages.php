@@ -6,4 +6,8 @@ return [
     'login' => 'Log in',
     'register' => 'Register',
     'language' => 'Language',
+    'rights'=>'All Rights Reserved',
+    'add-to-cart'=>'Add to Card',
+    'in-stock' => 'In Stock',
+    'out-of-stock' => 'Out of Stock',
 ];
