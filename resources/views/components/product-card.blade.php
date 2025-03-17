@@ -109,8 +109,7 @@
         @else
             <button disabled 
                 class="w-full bg-gray-400 text-white px-5 py-2.5 text-sm font-medium rounded-lg 
-                hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300 cursor-not-allowed
-                ">
+                hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300 cursor-not-allowed">
                 {{ __('messages.out-of-stock') }}
             </button>
         @endif

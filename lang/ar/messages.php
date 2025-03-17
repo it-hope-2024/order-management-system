@@ -10,4 +10,6 @@ return [
     'add-to-cart'=>'اضف الى السلة',
     'in-stock' => 'المتوفر',
     'out-of-stock' => 'غير متوفر',
+    'my-orders'=>'طلباتي',
+    'my-purchases'=>'مشترياتي',
 ];

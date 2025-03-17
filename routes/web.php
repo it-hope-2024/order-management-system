@@ -41,8 +41,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::post('/orders/add-to-cart/{product}', [OrderController::class, 'addToCart'])->name('orders.add-to-cart');
     Route::post('/orders/remove-item/{id}', [OrderController::class, 'removeItem'])->name('orders.remove-item');
+    Route::post('/orders/decrease-item/{id}', [OrderController::class, 'decreaseItem'])->name('orders.decrease-item');
     Route::post('/orders/confirm', [OrderController::class, 'confirmOrder'])->name('orders.confirm');
     Route::get('/orders/my-orders', [OrderController::class, 'myOrders'])->name('orders.my-orders');
+    Route::get('/orders/my-purchases', [OrderController::class, 'myPurchases'])->name('orders.my-purchases');
     Route::resource('orders', OrderController::class);
 });
 

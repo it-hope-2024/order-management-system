@@ -10,4 +10,6 @@ return [
     'add-to-cart'=>'Add to Card',
     'in-stock' => 'In Stock',
     'out-of-stock' => 'Out of Stock',
+    'my-orders'=>'My Orders',
+    'my-purchases'=>'My Purchases',
 ];

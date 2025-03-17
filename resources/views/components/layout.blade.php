@@ -58,7 +58,7 @@ function addToCart(productId) {
     })
     .then(data => {
         if (data.success) {
-            Swal.fire("Added to cart!", "Product added successfully!", "success");
+            Swal.fire("Added to cart!", data.message, "success");
             document.getElementById("cart-count").innerText = data.cartCount;  // ✅ تحديث عدد المنتجات في السلة
             document.getElementById(`product-stock-${productId}`).innerText = data.newStock;  // ✅ تحديث المخزون
 
@@ -128,25 +128,25 @@ function updateCartCount(count) {
 //         });
 //     });
 // }
-function removeItem(itemId) {
-    fetch(`/orders/remove-item/${itemId}`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('cart-count').innerText = data.cartCount;
-            Swal.fire('تم الحذف!', data.message, 'success').then(() => location.reload());
-        } else {
-            Swal.fire('خطأ!', data.message, 'error');
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
+// function removeItem(itemId) {
+//     fetch(`/orders/remove-item/${itemId}`, {
+//         method: 'POST',
+//         headers: {
+//             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+//             'Content-Type': 'application/json'
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             document.getElementById('cart-count').innerText = data.cartCount;
+//             Swal.fire('Deleted Done!', data.message, 'success').then(() => location.reload());
+//         } else {
+//             Swal.fire('Error!', data.message, 'error');
+//         }
+//     })
+//     .catch(error => console.error('Error:', error));
+// }
 
 function confirmOrder() {
     fetch('/orders/confirm', {
@@ -160,14 +160,54 @@ function confirmOrder() {
     .then(data => {
         if (data.success) {
             document.getElementById('cart-count').innerText = 0;
-            Swal.fire('تم التأكيد!', data.message, 'success').then(() => location.reload());
+            Swal.fire('Confirm Done!', data.message, 'success').then(() => location.reload());
         } else {
-            Swal.fire('خطأ!', data.message, 'error');
+            Swal.fire('Error!', data.message, 'error');
         }
     })
     .catch(error => console.error('Error:', error));
 }
 
+
+function decreaseItem(itemId) {
+    fetch(`/orders/decrease-item/${itemId}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('cart-count').innerText = data.cartCount;
+            Swal.fire('Updated!', data.message, 'success').then(() => location.reload());
+        } else {
+            Swal.fire('Error!', data.message, 'error');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function removeItem(itemId) {
+    fetch(`/orders/remove-item/${itemId}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('cart-count').innerText = data.cartCount;
+            Swal.fire('Deleted!', data.message, 'success').then(() => location.reload());
+        } else {
+            Swal.fire('Error!', data.message, 'error');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
 
 
 
