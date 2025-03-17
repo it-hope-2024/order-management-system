@@ -23,86 +23,111 @@
 </html>
  
 <script>
+function increaseQuantity(productId, maxStock) {
+    let qtyInput = document.getElementById(`quantity-${productId}`);
+    let currentQty = parseInt(qtyInput.value);
+    if (currentQty < maxStock) {
+        qtyInput.value = currentQty + 1;
+    }
+}
 
+function decreaseQuantity(productId) {
+    let qtyInput = document.getElementById(`quantity-${productId}`);
+    let currentQty = parseInt(qtyInput.value);
+    if (currentQty > 1) {
+        qtyInput.value = currentQty - 1;
+    }
+}
+
+function addToCart(productId) {
+    let quantity = parseInt(document.getElementById(`quantity-${productId}`).value);
+
+    fetch(`/orders/add-to-cart/${productId}`, {  
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ quantity: quantity })  // ✅ أرسل الكمية مع الطلب
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            Swal.fire("Added to cart!", "Product added successfully!", "success");
+            document.getElementById("cart-count").innerText = data.cartCount;  // ✅ تحديث عدد المنتجات في السلة
+            document.getElementById(`product-stock-${productId}`).innerText = data.newStock;  // ✅ تحديث المخزون
+
+            if (data.newStock == 0) {
+                let stockElement = document.getElementById(`product-stock-${productId}`);
+                stockElement.classList.remove("text-green-600");
+                stockElement.classList.add("text-red-600");
+                stockElement.innerText = "Out of stock";
+
+                let addButton = document.getElementById(`add-to-cart-btn-${productId}`);
+                if (addButton) addButton.remove();
+            }
+        } else {
+            Swal.fire("Oops!", data.message, "error");
+        }
+    })
+    .catch(error => console.error("Fetch error:", error));
+}
+function updateCartCount(count) {
+    document.getElementById("cart-count").innerText = count;
+}
     
 
 
 
 
 // function addToCart(productId) {
-//     console.log("Adding product to cart...");
-
-//     // Sending a POST request to add the product to the cart
 //     fetch(`/orders/add-to-cart/${productId}`, {
-//         method: 'POST',
+//         method: "POST",
 //         headers: {
-//             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,  // CSRF Token for security
-//             'Content-Type': 'application/json'  // Set the content type as JSON
+//             "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+//             "Content-Type": "application/json",
 //         },
-//         body: JSON.stringify({
-//             // You can send more data if needed, such as quantity or additional product details
-//             productId: productId
-//         })
+//         body: JSON.stringify({}),
 //     })
-//     .then(response => response.json())  // Parse the JSON response
+//     .then(response => response.json())
 //     .then(data => {
-//         // Check if the response was successful
 //         if (data.success) {
-//             // Update the cart count (you can adjust this based on your page structure)
-//             document.getElementById('cart-count').innerText = data.cartCount;
-//             Swal.fire('تمت الإضافة!', 'تمت إضافة المنتج إلى طلباتك.', 'success');  // Show success message
-//         } else {
-//             Swal.fire('خطأ!', data.message, 'error');  // Show error message if something went wrong
+//             document.getElementById("cart-count").innerText = data.cartCount;
+//             document.getElementById(`product-stock-${productId}`).innerText = data.newStock;
+
+//             if (data.newStock == 0) {
+//                 let stockElement = document.getElementById(`product-stock-${productId}`);
+//                 stockElement.classList.remove("text-green-600");
+//                 stockElement.classList.add("text-red-600");
+//                 stockElement.innerText = "نفد من المخزون";
+
+//                 let addButton = document.getElementById(`add-to-cart-btn-${productId}`);
+//                 if (addButton) addButton.remove();
+//             }
+
+//             Swal.fire({
+//                 icon: "success",
+//                 title: "تمت الإضافة",
+//                 text: "تمت إضافة المنتج إلى السلة!",
+//                 timer: 1500,
+//                 showConfirmButton: false,
+//             });
 //         }
 //     })
 //     .catch(error => {
-//         console.error('Error:', error);  // Log any errors that occur
-//         Swal.fire('خطأ!', 'حدث خطأ غير متوقع.', 'error');  // Show a generic error message
+//         console.error("Error:", error);
+//         Swal.fire({
+//             icon: "error",
+//             title: "خطأ!",
+//             text: "حدث خطأ غير متوقع.",
+//         });
 //     });
 // }
-function addToCart(productId) {
-    fetch(`/orders/add-to-cart/${productId}`, {
-        method: "POST",
-        headers: {
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({}),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById("cart-count").innerText = data.cartCount;
-            document.getElementById(`product-stock-${productId}`).innerText = data.newStock;
-
-            if (data.newStock == 0) {
-                let stockElement = document.getElementById(`product-stock-${productId}`);
-                stockElement.classList.remove("text-green-600");
-                stockElement.classList.add("text-red-600");
-                stockElement.innerText = "نفد من المخزون";
-
-                let addButton = document.getElementById(`add-to-cart-btn-${productId}`);
-                if (addButton) addButton.remove();
-            }
-
-            Swal.fire({
-                icon: "success",
-                title: "تمت الإضافة",
-                text: "تمت إضافة المنتج إلى السلة!",
-                timer: 1500,
-                showConfirmButton: false,
-            });
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        Swal.fire({
-            icon: "error",
-            title: "خطأ!",
-            text: "حدث خطأ غير متوقع.",
-        });
-    });
-}
 function removeItem(itemId) {
     fetch(`/orders/remove-item/${itemId}`, {
         method: 'POST',

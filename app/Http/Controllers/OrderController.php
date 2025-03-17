@@ -6,105 +6,125 @@ use App\Models\OrderItem;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DB;
+use Illuminate\Support\Facades\DB as FacadesDB;
+
 class OrderController extends Controller
 {
 
 
-    // public function addToCart($productId)
-    // {
-    //     try {
-    //         // جلب المنتج من قاعدة البيانات
-    //         $product = Product::findOrFail($productId);
-    
-    //         // التحقق من توفر المخزون
-    //         if ($product->stock > 0) {
-                
-    //             // جلب الطلب الحالي للمستخدم، أو إنشاء طلب جديد إذا لم يكن موجودًا
-    //             $order = auth()->user()->orders()->where('status', 'pending')->first();
-    //             if (!$order) {
-    //                 $order = Order::create([
-    //                     'user_id' => auth()->id(),
-    //                     'status' => 'pending',
-    //                     'total_price' => 0, // سيتم تحديثه لاحقًا
-    //                 ]);
-    //             }
-    
-    //             // إضافة المنتج إلى الطلب
-    //             $orderItem = $order->orderItems()->create([
-    //                 'product_id' => $product->id,
-    //                 'quantity' => 1, // يمكن تغييرها بناءً على المدخلات
-    //                 'price_at_purchase' => $product->price,
-    //             ]);
-    
-    //             // تقليل الكمية من المخزون
-    //             $product->decrement('stock');
-    
-    //             // تحديث إجمالي السعر للطلب
-    //             $order->update([
-    //                 'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
-    //             ]);
-    
-    //             // إرجاع استجابة نجاح مع عدد العناصر في السلة
-    //             return response()->json([
-    //                 'success' => true,
-    //                 'cartCount' => $order->orderItems()->count()
-    //             ]);
-    //         }
-    
-    //         // إذا كان المنتج غير متوفر، إرجاع رسالة خطأ
-    //         return response()->json(['success' => false, 'message' => 'Product out of stock.'], 400);
-    
-    //     } catch (\Exception $e) {
-    //         return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
-    //     }
-    // }
-    public function addToCart($productId)
+
+//     public function addToCart($productId)
+// {
+//     try {
+//         // جلب المنتج
+//         $product = Product::findOrFail($productId);
+
+//         // التحقق من توفر المخزون
+//         if ($product->stock > 0) {
+//             $order = auth()->user()->orders()->where('status', 'pending')->first();
+//             if (!$order) {
+//                 $order = Order::create([
+//                     'user_id' => auth()->id(),
+//                     'status' => 'pending',
+//                     'total_price' => 0,
+//                 ]);
+//             }
+
+//             // إضافة المنتج إلى الطلب
+//             $order->orderItems()->create([
+//                 'product_id' => $product->id,
+//                 'quantity' => 1,
+//                 'price_at_purchase' => $product->price,
+//             ]);
+
+//             // تقليل الكمية من المخزون
+//             $product->decrement('stock');
+
+//             // تحديث إجمالي السعر للطلب
+//             $order->update([
+//                 'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
+//             ]);
+
+//             // إرسال المخزون الجديد للواجهة
+//             return response()->json([
+//                 'success' => true,
+//                 'cartCount' => $order->orderItems()->count(),
+//                 'newStock' => $product->fresh()->stock, // تحديث الكمية بعد التعديل
+//             ]);
+//         }
+
+//         return response()->json(['success' => false, 'message' => 'Product out of stock.'], 400);
+
+//     } catch (\Exception $e) {
+//         return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
+//     }
+// }
+
+public function addToCart($productId, Request $request)
 {
     try {
         // جلب المنتج
         $product = Product::findOrFail($productId);
 
+        // الحصول على الكمية المطلوبة من الطلب (أو افتراضيًا 1)
+        $quantity = $request->input('quantity', 1);
+
         // التحقق من توفر المخزون
-        if ($product->stock > 0) {
-            $order = auth()->user()->orders()->where('status', 'pending')->first();
-            if (!$order) {
-                $order = Order::create([
-                    'user_id' => auth()->id(),
-                    'status' => 'pending',
-                    'total_price' => 0,
-                ]);
-            }
-
-            // إضافة المنتج إلى الطلب
-            $order->orderItems()->create([
-                'product_id' => $product->id,
-                'quantity' => 1,
-                'price_at_purchase' => $product->price,
-            ]);
-
-            // تقليل الكمية من المخزون
-            $product->decrement('stock');
-
-            // تحديث إجمالي السعر للطلب
-            $order->update([
-                'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
-            ]);
-
-            // إرسال المخزون الجديد للواجهة
+        if ($product->stock < $quantity) {
             return response()->json([
-                'success' => true,
-                'cartCount' => $order->orderItems()->count(),
-                'newStock' => $product->fresh()->stock, // تحديث الكمية بعد التعديل
+                'success' => false, 
+                'message' => 'Not enough stock available.'
+            ], 400);
+        }
+
+        // البحث عن طلب المستخدم الحالي (المعلق)
+        $order = auth()->user()->orders()->where('status', 'pending')->first();
+        if (!$order) {
+            $order = Order::create([
+                'user_id' => auth()->id(),
+                'status' => 'pending',
+                'total_price' => 0,
             ]);
         }
 
-        return response()->json(['success' => false, 'message' => 'Product out of stock.'], 400);
+        // البحث عن المنتج في الطلب الحالي (إن وجد)
+        $orderItem = $order->orderItems()->where('product_id', $product->id)->first();
+
+        if ($orderItem) {
+            // إذا كان المنتج موجودًا، قم بتحديث الكمية فقط
+            $orderItem->increment('quantity', $quantity);
+        } else {
+            // إذا لم يكن المنتج موجودًا، أضفه إلى الطلب
+            $order->orderItems()->create([
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+                'price_at_purchase' => $product->price,
+            ]);
+        }
+
+        // تقليل الكمية من المخزون
+        $product->decrement('stock', $quantity);
+
+        // تحديث إجمالي السعر للطلب
+        $order->update([
+            'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
+        ]);
+
+        // إرسال المخزون الجديد وعدد العناصر المحدث إلى الواجهة
+        return response()->json([
+            'success' => true,
+            'cartCount' => $order->orderItems()->sum('quantity'),  // ✅ عدد جميع العناصر في السلة
+            'newStock' => $product->fresh()->stock, // ✅ تحديث الكمية بعد التعديل
+        ]);
 
     } catch (\Exception $e) {
-        return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
+        return response()->json([
+            'success' => false, 
+            'message' => 'An unexpected error occurred.'
+        ], 500);
     }
 }
-
     // 🗑️ حذف المنتج من السلة
     public function removeItem($id)
     {
