@@ -8,3 +8,8 @@ window.Alpine = Alpine;
 
 Alpine.start();
 window.Swal = Swal; // Make it globally accessible
+
+
+
+
+

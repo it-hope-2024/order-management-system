@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -19,7 +20,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale()], function () {
     // })->name('home');
     // Route::get('', fn() => to_route('products.index'))->name('home');
     Route::get('', fn() => redirect(LaravelLocalization::getLocalizedURL(app()->getLocale(), 'products')))->name('home');
-    // Route::get('', fn() => redirect(LaravelLocalization::getLocalizedURL(app()->getLocale(), 'products.index')))->name('home');
+
 
 
     Route::get('/products/list', [ProductController::class, 'getProducts'])->name('products.list');
@@ -35,6 +36,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/orders/add-to-cart/{product}', [OrderController::class, 'addToCart'])->name('orders.add-to-cart');
+    Route::post('/orders/remove-item/{id}', [OrderController::class, 'removeItem'])->name('orders.remove-item');
+    Route::post('/orders/confirm', [OrderController::class, 'confirmOrder'])->name('orders.confirm');
+    Route::get('/orders/my-orders', [OrderController::class, 'myOrders'])->name('orders.my-orders');
+    Route::resource('orders', OrderController::class);
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

@@ -53,6 +53,17 @@
                                     {{__('messages.dashboard')}}
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ route('orders.my-orders') }}" class="relative">
+                                    <button class="text-white bg-blue-700 px-4 py-2 rounded-lg">
+                                        طلباتي
+                                    </button>
+                                    <span id="cart-count"
+                                        class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                        {{ Auth::user()->orders()->where('status', 'pending')->withCount('orderItems')->first()->order_items_count ?? 0 }}
+                                    </span>
+                                </a>
+                        </li>
                         @else
                             <li>
                                 <a href="{{ route('login') }}"

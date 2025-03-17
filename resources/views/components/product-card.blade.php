@@ -84,7 +84,7 @@
 
             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                 {{ __('messages.in-stock') }}: 
-                <span class="font-semibold {{ $product->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
+                <span id="product-stock-{{ $product->id }}" class="font-semibold {{ $product->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
                     {{ $product->stock > 0 ? $product->stock : __('messages.out-of-stock') }}
                 </span>
             </p>
@@ -98,7 +98,7 @@
             </p>
 
             @if ($product->stock > 0)
-                <button type="button"
+                <button type="button" id="add-to-cart-btn-{{ $product->id }}" onclick="addToCart({{ $product->id }})"
                     class="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white 
                     hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 min-w-[160px]">
                     <svg class="-ms-2 me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
