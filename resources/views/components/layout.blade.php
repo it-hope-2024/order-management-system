@@ -209,6 +209,26 @@ function removeItem(itemId) {
     .catch(error => console.error('Error:', error));
 }
 
+function showAuthAlert() {
+    Swal.fire({
+        title: "You're not logged in!",
+        text: "Please login or register to add items to your cart.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Login",
+        cancelButtonText: "Register",
+        allowOutsideClick: false,
+        showCloseButton: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "/login";  // Redirect to login page
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            window.location.href = "/register";  // Redirect to register page
+        }
+    });
+}
+
+
 
 
 

@@ -1,51 +1,46 @@
-<x-table-layout title="Product List">
-    
+<x-table-layout title="Orders "> 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1>Product List</h1>
-            <a href="{{ route('products.create') }}" class="btn btn-success">Create Product</a>
+            <h1>Orders </h1>
+            <a href="{{ route('orders.create') }}" class="btn btn-success">Create Order</a>
         </div>
         <table class="table table-bordered data-table">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Name En</th>
-                    <th>Name Ar</th>
-                    <th>Price</th>
-                    <th>Stock</th>
+                    <th>User Name</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Created At</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
-
 </x-table-layout>
-
 
 <script type="text/javascript">
     $(function () {
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('products.list') }}",
+            ajax: "{{ route('orders.index') }}",
             columns: [
                 {data: 'id', name: 'id'},
-                // {data: 'name', name: 'name', title: 'Name'},
-                {data: 'name_en', name: 'name_en',orderable: true },
-                {data: 'name_ar', name: 'name_ar',orderable: true},
-                {data: 'price', name: 'price'},
-                {data: 'stock', name: 'stock'},
+                {data: 'user_name', name: 'user_name'},
+                {data: 'total_price', name: 'total_price'},
+                {data: 'status', name: 'status'},
+                {data: 'created_at', name: 'created_at'},
                 {data: 'action', name: 'action', orderable: false, searchable: false}
             ]
         });
     });
-    //SWAL Func
+
+    // DELETE WITH SWAL
     $(document).on("click", ".delete-btn", function (e) {
-        e.preventDefault(); // Prevent default form submission
-
-        var form = $(this).closest("form"); // Get the closest form element
-
+        e.preventDefault();
+        var form = $(this).closest("form");
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -56,14 +51,13 @@
             confirmButtonText: "Yes, delete it!"
         }).then((result) => {
             if (result.isConfirmed) {
-                form.submit(); // Submit the form if confirmed
+                form.submit();
             }
         });
     });
 
-    // Show SweetAlert Toast if a success message exists in session
+    // SWEET ALERT SUCCESS MESSAGE
     $(document).ready(function () {
-        // Check if session delete message exists
         @if(session('delete'))
             Swal.fire({
                 toast: true,
@@ -76,9 +70,7 @@
         @endif
     });
 
-
     document.addEventListener("DOMContentLoaded", function () {
-        // Check if success message is stored in sessionStorage
         let successMessage = sessionStorage.getItem('successMessage');
         if (successMessage) {
             Swal.fire({
@@ -89,14 +81,11 @@
                 showConfirmButton: false,
                 timer: 3000
             });
-            sessionStorage.removeItem('successMessage'); // Clear message after displaying
+            sessionStorage.removeItem('successMessage');
         }
     });
 
-    // Before redirecting, store success message
     @if(session('success'))
         sessionStorage.setItem('successMessage', "{{ session('success') }}");
     @endif
 </script>
-
-

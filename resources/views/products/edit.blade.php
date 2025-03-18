@@ -1,7 +1,6 @@
 <x-table-layout title="Edit Product">
     <div class="container mt-4">
         <div class="d-flex align-items-center mb-4">
-            <!-- Go Back Button -->
             <a href="{{ route('products.list') }}" 
                class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center me-2" 
                style="width: 40px; height: 40px;">

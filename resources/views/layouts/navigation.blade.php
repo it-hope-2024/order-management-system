@@ -19,6 +19,13 @@
                     <x-nav-link :href="route('home')"  >
                         Home
                     </x-nav-link>
+                    @auth
+    @if (auth()->user()->is_admin) 
+                    <x-nav-link :href="route('management')"  >
+                        Management
+                    </x-nav-link>
+                    @endif
+                    @endauth
                 </div>
             </div>
 

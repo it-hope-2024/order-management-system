@@ -12,4 +12,5 @@ return [
     'out-of-stock' => 'Out of Stock',
     'my-orders'=>'My Orders',
     'my-purchases'=>'My Purchases',
+    'management'=>'Management'
 ];

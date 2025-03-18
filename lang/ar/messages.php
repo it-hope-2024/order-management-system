@@ -12,4 +12,5 @@ return [
     'out-of-stock' => 'غير متوفر',
     'my-orders'=>'طلباتي',
     'my-purchases'=>'مشترياتي',
+    'management'=>'ادارة'
 ];
