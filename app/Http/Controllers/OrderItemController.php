@@ -11,27 +11,50 @@ class OrderItemController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = OrderItem::with(['order', 'product'])->select('order_items.*');
-            return DataTables::of($data)
-                ->addColumn('order_id', fn ($row) => $row->order->id)
-                ->addColumn('product_name', fn ($row) => $row->product->name)
-                ->addColumn('quantity', fn ($row) => $row->quantity)
-                ->addColumn('price_at_purchase', fn ($row) => number_format($row->price_at_purchase, 2))
-                ->addColumn('action', function ($row) {
+            $orderitems = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
+                ->join('products', 'order_items.product_id', '=', 'products.id')
+                ->select([
+                    'order_items.id',
+                    'orders.id as order_id',
+                    'products.name as product_name',
+                    'order_items.quantity',
+                    'order_items.price_at_purchase',
+                    'order_items.created_at',
+                    'order_items.updated_at'
+                ]);
+    
+            return DataTables::of($orderitems)
+    ->filterColumn('product_name', function ($query, $keyword) {
+        $query->whereRaw('LOWER(products.name) LIKE ?', ["%" . strtolower($keyword) . "%"]);
+    })
+                ->editColumn('price_at_purchase', function ($orderitem) {
+                    return number_format($orderitem->price_at_purchase, 2) . ' $';
+                })
+                ->addColumn('action', function ($orderitem) {
                     return '
-                        <a href="' . route('orderitems.edit', $row->id) . '" class="btn btn-sm btn-primary">Edit</a>
-                        <form action="' . route('orderitems.destroy', $row->id) . '" method="POST" style="display:inline;">
-                            ' . csrf_field() . method_field('DELETE') . '
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure?\')">Delete</button>
+                      <div class="d-flex justify-content-between">
+                        <a href="' . route('orderitems.edit', $orderitem->id) . '" class="btn btn-info btn-sm">Edit</a>
+                        
+                        <form action="' . route('orderitems.destroy', $orderitem->id) . '" method="POST" class="delete-form">
+                            ' . csrf_field() . '
+                            ' . method_field('DELETE') . '
+                            <button type="button" class="btn btn-danger btn-sm delete-btn">Delete</button>
                         </form>
-                    ';
+                    </div>';
+                })
+                ->editColumn('created_at', function ($orderitem) {
+                    return $orderitem->created_at->format('Y-m-d H:i');
+                })
+                ->editColumn('updated_at', function ($orderitem) {
+                    return $orderitem->updated_at->format('Y-m-d H:i');
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
-
+    
         return view('orderitems.index');
     }
+
 
     public function create()
     {

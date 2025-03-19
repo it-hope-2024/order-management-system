@@ -16,21 +16,22 @@
         </table>
     </div>
     
-    <script>
-        $(document).ready(function() {
-            var table =$('#orders-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('orders.list') }}",
-                columns: [
-                    { data: 'id', name: 'id' },
-                    { data: 'user_name', name: 'user_name' },
-                    { data: 'products', name: 'products' },
-                    { data: 'total_price', name: 'total_price' },
-                    { data: 'created_at', name: 'created_at' }
-                ]
-            });
-        });
-    </script>
+
 </x-table-layout>
 
+<script>
+    $(document).ready(function() {
+        var table =$('#orders-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('orders.list') }}",
+            columns: [
+                { data: 'id', name: 'id' },
+                { data: 'user_name', name: 'user_name' },
+                { data: 'products', name: 'products' },
+                { data: 'total_price', name: 'total_price' },
+                { data: 'created_at', name: 'created_at' }
+            ]
+        });
+    });
+</script>

@@ -61,10 +61,23 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link " href="#">
+                            <a class="nav-link " href="{{ route('orderitems.index') }}">
                                  Order Items (CRUD)
                             </a>
                         </li>
+                                        <!-- Dropdown for Reports -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Reports
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+                        <li><a class="dropdown-item" href="{{ route('reports.orders_last_7_days') }}">Orders Last 7 Days</a></li>
+                        <li><a class="dropdown-item" href="{{ route('reports.product_sales_last_30_days') }}">Product Sales Last 30 Days</a></li>
+                        <li><a class="dropdown-item" href="{{ route('reports.top_5_customers') }}">Top 5 Customers</a></li>
+                        <li><a class="dropdown-item" href="{{ route('reports.orders_with_more_than_3_products') }}">Orders With 3+ Products</a></li>
+                        <li><a class="dropdown-item" href="{{ route('reports.order_products_list') }}">Products Per Order</a></li>
+                    </ul>
+                </li>
                     </ul>
                 </div>
             </div>

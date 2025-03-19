@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -35,6 +37,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale()], function () {
         Route::get('/orders/my-purchases', [OrderController::class, 'myPurchases'])->name('orders.my-purchases');
         Route::get('/orders/list', [OrderController::class, 'getOrders'])->name('orders.list');
         Route::resource('orders', OrderController::class);
+        Route::resource('orderitems', OrderItemController::class);
     });
 });
 Route::get('/dashboard', function () {
@@ -55,5 +58,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/management', function () {
         return view('management.index', ['user' => Auth::user()]); 
     })->name('management');
+});
+
+
+Route::prefix('reports')->group(function () {
+    Route::get('/orders-last-7-days', [ReportController::class, 'ordersLast7Days'])->name('reports.orders_last_7_days');
+    Route::get('/product-sales-last-30-days', [ReportController::class, 'productSalesLast30Days'])->name('reports.product_sales_last_30_days');
+    Route::get('/top-5-customers', [ReportController::class, 'top5Customers'])->name('reports.top_5_customers');
+    Route::get('/orders-with-more-than-3-products', [ReportController::class, 'ordersWithMoreThan3Products'])->name('reports.orders_with_more_than_3_products');
+    Route::get('/order-products-list', [ReportController::class, 'orderProductsList'])->name('reports.order_products_list');
 });
 require __DIR__ . '/auth.php';
