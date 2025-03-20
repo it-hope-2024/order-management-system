@@ -1,13 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Yajra\DataTables\DataTables;
-class OrderItemController extends Controller
+
+class OrderItemController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(['auth', 'admin'],),
+        ];
+    }
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -22,11 +32,11 @@ class OrderItemController extends Controller
                     'order_items.created_at',
                     'order_items.updated_at'
                 ]);
-    
+
             return DataTables::of($orderitems)
-    ->filterColumn('product_name', function ($query, $keyword) {
-        $query->whereRaw('LOWER(products.name) LIKE ?', ["%" . strtolower($keyword) . "%"]);
-    })
+                ->filterColumn('product_name', function ($query, $keyword) {
+                    $query->whereRaw('LOWER(products.name) LIKE ?', ["%" . strtolower($keyword) . "%"]);
+                })
                 ->editColumn('price_at_purchase', function ($orderitem) {
                     return number_format($orderitem->price_at_purchase, 2) . ' $';
                 })
@@ -51,7 +61,7 @@ class OrderItemController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         }
-    
+
         return view('orderitems.index');
     }
 
@@ -60,8 +70,8 @@ class OrderItemController extends Controller
     {
         $orders = Order::all();
         $products = Product::all();
-        return view('orderitems.create',['orders'=>$orders,'products'=>$products]);
-    } 
+        return view('orderitems.create', ['orders' => $orders, 'products' => $products]);
+    }
 
     public function store(Request $request)
     {
@@ -81,8 +91,8 @@ class OrderItemController extends Controller
     {
         $orders = Order::all();
         $products = Product::all();
-        return view('orderitems.edit', ['orders'=>$orders,'orderitem'=>$orderitem,'products'=>$products]);
-    } 
+        return view('orderitems.edit', ['orders' => $orders, 'orderitem' => $orderitem, 'products' => $products]);
+    }
 
     public function update(Request $request, OrderItem $orderitem)
     {
@@ -103,5 +113,4 @@ class OrderItemController extends Controller
         $orderitem->delete();
         return back()->with('delete', 'Order item deleted successfully!');
     }
-
 }

@@ -23,11 +23,22 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route('reports.orders_last_7_days') }}",
-            columns: [
-                { data: 'id', name: 'id' },
-                { data: 'customer_name', name: 'customer_name' },
-                { data: 'total_price', name: 'total_price' },
-                { data: 'created_at', name: 'created_at' }
+            columns: [{
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'customer_name',
+                    name: 'customer_name'
+                },
+                {
+                    data: 'total_price',
+                    name: 'total_price'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                }
             ]
         });
     });

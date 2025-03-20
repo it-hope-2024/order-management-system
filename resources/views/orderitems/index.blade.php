@@ -1,4 +1,4 @@
-<x-table-layout title="Order Items"> 
+<x-table-layout title="Order Items">
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1>Order Items</h1>
@@ -23,26 +23,51 @@
 </x-table-layout>
 
 <script type="text/javascript">
-    $(function () {
+    $(function() {
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('orderitems.index') }}",
-            columns: [
-                {data: 'id', name: 'id'},
-                {data: 'order_id', name: 'order_id'},
-                {data: 'product_name', name: 'product_name'},
-                {data: 'quantity', name: 'quantity'},
-                {data: 'price_at_purchase', name: 'price_at_purchase'},
-                {data: 'created_at', name: 'created_at'},
-                {data: 'updated_at', name: 'updated_at'},
-                {data: 'action', name: 'action', orderable: false, searchable: false}
+            columns: [{
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'order_id',
+                    name: 'order_id'
+                },
+                {
+                    data: 'product_name',
+                    name: 'product_name'
+                },
+                {
+                    data: 'quantity',
+                    name: 'quantity'
+                },
+                {
+                    data: 'price_at_purchase',
+                    name: 'price_at_purchase'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    data: 'updated_at',
+                    name: 'updated_at'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
             ]
         });
     });
 
     // DELETE WITH SWAL
-    $(document).on("click", ".delete-btn", function (e) {
+    $(document).on("click", ".delete-btn", function(e) {
         e.preventDefault();
         var form = $(this).closest("form");
         Swal.fire({
@@ -61,8 +86,8 @@
     });
 
     // SWEET ALERT SUCCESS MESSAGE
-    $(document).ready(function () {
-        @if(session('delete'))
+    $(document).ready(function() {
+        @if (session('delete'))
             Swal.fire({
                 toast: true,
                 position: 'bottom-end',
@@ -73,7 +98,7 @@
             });
         @endif
     });
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         let successMessage = sessionStorage.getItem('successMessage');
         if (successMessage) {
             Swal.fire({
@@ -88,7 +113,7 @@
         }
     });
 
-    @if(session('success'))
+    @if (session('success'))
         sessionStorage.setItem('successMessage', "{{ session('success') }}");
     @endif
 </script>

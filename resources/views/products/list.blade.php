@@ -1,5 +1,5 @@
 <x-table-layout title="Product List">
-    
+
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1>Product List</h1>
@@ -24,24 +24,44 @@
 
 
 <script type="text/javascript">
-    $(function () {
+    $(function() {
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('products.list') }}",
-            columns: [
-                {data: 'id', name: 'id'},
-                // {data: 'name', name: 'name', title: 'Name'},
-                {data: 'name_en', name: 'name_en',orderable: true },
-                {data: 'name_ar', name: 'name_ar',orderable: true},
-                {data: 'price', name: 'price'},
-                {data: 'stock', name: 'stock'},
-                {data: 'action', name: 'action', orderable: false, searchable: false}
+            columns: [{
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'name_en',
+                    name: 'name_en',
+                    orderable: true
+                },
+                {
+                    data: 'name_ar',
+                    name: 'name_ar',
+                    orderable: true
+                },
+                {
+                    data: 'price',
+                    name: 'price'
+                },
+                {
+                    data: 'stock',
+                    name: 'stock'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
             ]
         });
     });
     //SWAL Func
-    $(document).on("click", ".delete-btn", function (e) {
+    $(document).on("click", ".delete-btn", function(e) {
         e.preventDefault(); // Prevent default form submission
 
         var form = $(this).closest("form"); // Get the closest form element
@@ -62,9 +82,9 @@
     });
 
     // Show SweetAlert Toast if a success message exists in session
-    $(document).ready(function () {
+    $(document).ready(function() {
         // Check if session delete message exists
-        @if(session('delete'))
+        @if (session('delete'))
             Swal.fire({
                 toast: true,
                 position: 'bottom-end',
@@ -77,7 +97,7 @@
     });
 
 
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         // Check if success message is stored in sessionStorage
         let successMessage = sessionStorage.getItem('successMessage');
         if (successMessage) {
@@ -94,9 +114,7 @@
     });
 
     // Before redirecting, store success message
-    @if(session('success'))
+    @if (session('success'))
         sessionStorage.setItem('successMessage', "{{ session('success') }}");
     @endif
 </script>
-
-

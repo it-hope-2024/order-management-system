@@ -4,11 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Yajra\DataTables\Facades\DataTables;
 
 
-class ProductController extends Controller
+class ProductController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(['auth', 'admin'], except: ['index']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
@@ -24,7 +32,6 @@ class ProductController extends Controller
         if ($request->ajax()) {
             $products = Product::select([
                 'id',
-                // 'name',
                 'name->en as name_en',
                 'name->ar as name_ar',
                 'price',
@@ -34,12 +41,6 @@ class ProductController extends Controller
 
 
             return DataTables::of($products)
-                // ->addColumn('name_en', function ($product) {
-                //     return $product->getTranslation('name', 'en');  // Assuming you want the English translation
-                // })
-                // ->addColumn('name_ar', function ($product) {
-                //     return $product->getTranslation('name', 'ar');  // Assuming you want the English translation
-                // })
                 ->filterColumn('name_en', function ($query, $keyword) {
                     $query->whereRaw("LOWER(JSON_UNQUOTE(JSON_EXTRACT(name, '$.en'))) LIKE ?", ["%" . strtolower($keyword) . "%"]);
                 })

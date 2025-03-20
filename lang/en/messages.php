@@ -5,6 +5,7 @@ return [
     'dashboard' => 'Dashboard',
     'login' => 'Log in',
     'register' => 'Register',
+    'logout'=>'Logout',
     'language' => 'Language',
     'rights'=>'All Rights Reserved',
     'add-to-cart'=>'Add to Card',

@@ -6,6 +6,7 @@
                 <tr>
                     <th>Order ID</th>
                     <th>Distinct Products</th>
+
                 </tr>
             </thead>
         </table>
@@ -21,9 +22,16 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route('reports.orders_with_more_than_3_products') }}",
-            columns: [
-                { data: 'order_id', name: 'order_id' },
-                { data: 'distinct_products', name: 'distinct_products' }
+            columns: [{
+                    data: 'order_id',
+                    name: 'order_id'
+                },
+                {
+                    data: 'distinct_products',
+                    name: 'distinct_products'
+                }
+
+
             ]
         });
     });

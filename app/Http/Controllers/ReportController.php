@@ -7,9 +7,17 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderItem;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ReportController extends Controller
+class ReportController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(['auth','admin'], ),
+        ];
+    }
 public function ordersLast7Days(Request $request)
 {
     if ($request->ajax()) {
@@ -80,22 +88,19 @@ public function top5Customers(Request $request)
             ')
             ->join('orders', 'users.id', '=', 'orders.user_id')
             ->groupBy('users.id', 'users.name')
-            ->orderByDesc('total_spent')
+            ->orderBy('total_spent', 'desc')
             ->limit(5);
 
         return DataTables::of($topCustomers)
         ->filterColumn('customer_id', function ($query, $keyword) {
             $query->where('users.id', 'like', "%" . $keyword . "%");
         })
-            // Filter for the customer name using users.name
             ->filterColumn('customer_name', function ($query, $keyword) {
                 $query->whereRaw('LOWER(users.name) LIKE ?', ["%" . strtolower($keyword) . "%"]);
             })
-            // Filter for the total spent using SUM(orders.total_price)
             ->filterColumn('total_spent', function ($query, $keyword) {
                 $query->havingRaw('SUM(orders.total_price) LIKE ?', ["%{$keyword}%"]);
             })
-            // Make sure the sorting works for the total_spent column
             ->orderColumn('total_spent', function ($query, $order) {
                 $query->orderByRaw('SUM(orders.total_price) ' . $order);
             })
@@ -105,8 +110,6 @@ public function top5Customers(Request $request)
     return view('reports.top_5_customers');
 }
 
-
-
 public function ordersWithMoreThan3Products(Request $request)
 {
     if ($request->ajax()) {
@@ -115,7 +118,6 @@ public function ordersWithMoreThan3Products(Request $request)
             ->groupBy('orders.id')
             ->having('distinct_products', '>', 3);
 
-        // Add search filters for order_id and distinct_products
         return DataTables::of($orders)
             ->filterColumn('order_id', function ($query, $keyword) {
                 $query->where('orders.id', 'like', "%" . $keyword . "%");
@@ -130,35 +132,6 @@ public function ordersWithMoreThan3Products(Request $request)
 }
 
 
-
-// public function orderProductsList(Request $request)
-// {
-//     if ($request->ajax()) {
-//         $orders = Order::selectRaw('
-//                 orders.id as order_id, 
-//                 GROUP_CONCAT(products.name SEPARATOR ", ") as products
-//             ')
-//             ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-//             ->join('products', 'order_items.product_id', '=', 'products.id')
-//             ->groupBy('orders.id');
-
-//         return DataTables::of($orders)
-//             ->filterColumn('order_id', function ($query, $keyword) {
-//                 $query->where('orders.id', 'like', "%" . $keyword . "%");
-//             })
-//             // Adjust the search for products using havingRaw for aggregation
-//             ->filterColumn('products', function ($query, $keyword) {
-//                 $query->havingRaw('GROUP_CONCAT(products.name SEPARATOR ", ") LIKE ?', ["%{$keyword}%"]);
-
-//             })
-
-
-            
-//             ->make(true);
-//     }
-
-//     return view('reports.order_products_list');
-// }
 
 public function orderProductsList(Request $request)
 {
@@ -175,7 +148,6 @@ public function orderProductsList(Request $request)
             ->filterColumn('order_id', function ($query, $keyword) {
                 $query->where('orders.id', 'like', "%" . $keyword . "%");
             })
-            // Adjust the search for products using havingRaw for aggregation
             ->filterColumn('products', function ($query, $keyword) {
                 $query->havingRaw('GROUP_CONCAT(CONCAT(products.name, " (", order_items.quantity, ")") SEPARATOR ", ") LIKE ?', ["%{$keyword}%"]);
             })

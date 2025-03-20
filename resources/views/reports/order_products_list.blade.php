@@ -5,7 +5,7 @@
             <thead>
                 <tr>
                     <th>Order ID</th>
-                    <th>Products</th>
+                    <th>Products(QTY)</th>
                 </tr>
             </thead>
         </table>
@@ -21,9 +21,14 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route('reports.order_products_list') }}",
-            columns: [
-                { data: 'order_id', name: 'order_id' },
-                { data: 'products', name: 'products' }
+            columns: [{
+                    data: 'order_id',
+                    name: 'order_id'
+                },
+                {
+                    data: 'products',
+                    name: 'products'
+                }
             ]
         });
     });

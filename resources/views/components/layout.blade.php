@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}"> 
-    <title>{{ env('APP_NAME') }}</title>
-   
+    <title>{{ $title ?? config('app.name') }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -48,7 +47,7 @@ function addToCart(productId) {
             "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ quantity: quantity })  // ✅ أرسل الكمية مع الطلب
+        body: JSON.stringify({ quantity: quantity })  
     })
     .then(response => {
         if (!response.ok) {
@@ -59,8 +58,8 @@ function addToCart(productId) {
     .then(data => {
         if (data.success) {
             Swal.fire("Added to cart!", data.message, "success");
-            document.getElementById("cart-count").innerText = data.cartCount;  // ✅ تحديث عدد المنتجات في السلة
-            document.getElementById(`product-stock-${productId}`).innerText = data.newStock;  // ✅ تحديث المخزون
+            document.getElementById("cart-count").innerText = data.cartCount;  
+            document.getElementById(`product-stock-${productId}`).innerText = data.newStock;  
 
             if (data.newStock == 0) {
                 let stockElement = document.getElementById(`product-stock-${productId}`);
@@ -81,72 +80,6 @@ function updateCartCount(count) {
     document.getElementById("cart-count").innerText = count;
 }
     
-
-
-
-
-// function addToCart(productId) {
-//     fetch(`/orders/add-to-cart/${productId}`, {
-//         method: "POST",
-//         headers: {
-//             "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-//             "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({}),
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         if (data.success) {
-//             document.getElementById("cart-count").innerText = data.cartCount;
-//             document.getElementById(`product-stock-${productId}`).innerText = data.newStock;
-
-//             if (data.newStock == 0) {
-//                 let stockElement = document.getElementById(`product-stock-${productId}`);
-//                 stockElement.classList.remove("text-green-600");
-//                 stockElement.classList.add("text-red-600");
-//                 stockElement.innerText = "نفد من المخزون";
-
-//                 let addButton = document.getElementById(`add-to-cart-btn-${productId}`);
-//                 if (addButton) addButton.remove();
-//             }
-
-//             Swal.fire({
-//                 icon: "success",
-//                 title: "تمت الإضافة",
-//                 text: "تمت إضافة المنتج إلى السلة!",
-//                 timer: 1500,
-//                 showConfirmButton: false,
-//             });
-//         }
-//     })
-//     .catch(error => {
-//         console.error("Error:", error);
-//         Swal.fire({
-//             icon: "error",
-//             title: "خطأ!",
-//             text: "حدث خطأ غير متوقع.",
-//         });
-//     });
-// }
-// function removeItem(itemId) {
-//     fetch(`/orders/remove-item/${itemId}`, {
-//         method: 'POST',
-//         headers: {
-//             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-//             'Content-Type': 'application/json'
-//         }
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         if (data.success) {
-//             document.getElementById('cart-count').innerText = data.cartCount;
-//             Swal.fire('Deleted Done!', data.message, 'success').then(() => location.reload());
-//         } else {
-//             Swal.fire('Error!', data.message, 'error');
-//         }
-//     })
-//     .catch(error => console.error('Error:', error));
-// }
 
 function confirmOrder() {
     fetch('/orders/confirm', {

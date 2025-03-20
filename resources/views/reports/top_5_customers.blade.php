@@ -13,7 +13,7 @@
     </div>
 
 
- 
+
 </x-table-layout>
 <script>
     $(document).ready(function() {
@@ -21,10 +21,18 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route('reports.top_5_customers') }}",
-            columns: [
-                { data: 'customer_id', name: 'customer_id' },
-                { data: 'customer_name', name: 'customer_name' },
-                { data: 'total_spent', name: 'total_spent' }
+            columns: [{
+                    data: 'customer_id',
+                    name: 'customer_id'
+                },
+                {
+                    data: 'customer_name',
+                    name: 'customer_name'
+                },
+                {
+                    data: 'total_spent',
+                    name: 'total_spent'
+                }
             ]
         });
     });

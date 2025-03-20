@@ -9,23 +9,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DB;
 use App\Models\User;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Yajra\DataTables\DataTables;
 
-class OrderController extends Controller
+class OrderController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(['auth', 'admin'], only: ['index', 'create', 'store', 'update', 'edit', 'destroy', 'getOrders']),
+            new Middleware(['auth'],),
+
+        ];
+    }
 
     public function addToCart($productId, Request $request)
 
     {
 
         try {
-            // جلب المنتج
             $product = Product::findOrFail($productId);
 
-            // الحصول على الكمية المطلوبة من الطلب (أو افتراضيًا 1)
             $quantity = $request->input('quantity', 1);
 
-            // التحقق من توفر المخزون
             if ($product->stock < $quantity) {
                 return response()->json([
                     'success' => false,
@@ -33,7 +40,6 @@ class OrderController extends Controller
                 ], 400);
             }
 
-            // البحث عن طلب المستخدم الحالي (المعلق)
             $order = Auth::user()->orders()->where('status', 'pending')->first();
             if (!$order) {
                 $order = Order::create([
@@ -43,14 +49,11 @@ class OrderController extends Controller
                 ]);
             }
 
-            // البحث عن المنتج في الطلب الحالي (إن وجد)
             $orderItem = $order->orderItems()->where('product_id', $product->id)->first();
 
             if ($orderItem) {
-                // إذا كان المنتج موجودًا، قم بتحديث الكمية فقط
                 $orderItem->increment('quantity', $quantity);
             } else {
-                // إذا لم يكن المنتج موجودًا، أضفه إلى الطلب
                 $order->orderItems()->create([
                     'product_id' => $product->id,
                     'quantity' => $quantity,
@@ -58,20 +61,17 @@ class OrderController extends Controller
                 ]);
             }
 
-            // تقليل الكمية من المخزون
             $product->decrement('stock', $quantity);
 
-            // تحديث إجمالي السعر للطلب
             $order->update([
                 'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
             ]);
 
-            // إرسال المخزون الجديد وعدد العناصر المحدث إلى الواجهة
             return response()->json([
                 'success' => true,
                 'message' => 'Product added successfully!',
-                'cartCount' => $order->orderItems()->sum('quantity'),  // ✅ عدد جميع العناصر في السلة
-                'newStock' => $product->fresh()->stock, // ✅ تحديث الكمية بعد التعديل
+                'cartCount' => $order->orderItems()->sum('quantity'),
+                'newStock' => $product->fresh()->stock,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -94,7 +94,87 @@ class OrderController extends Controller
         return response()->json(['success' => true, 'message' => 'Order has Been Confirmed Successfully', 'cartCount' => 0]);
     }
 
-    // 🛍️ عرض الطلبات الحالية
+
+    public function removeItem($id)
+    {
+        try {
+            $orderItem = OrderItem::findOrFail($id);
+            $order = $orderItem->order;
+
+            $orderItem->product->increment('stock', $orderItem->quantity);
+
+            $orderItem->delete();
+
+            if ($order->orderItems()->count() === 0) {
+                $order->delete();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order deleted as it became empty!',
+                    'cartCount' => 0,
+                    'totalPrice' => 0
+                ]);
+            }
+
+            $order->update([
+                'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product removed successfully!',
+                'cartCount' => $order->orderItems()->sum('quantity'),
+                'totalPrice' => $order->total_price,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while removing the item.',
+            ], 500);
+        }
+    }
+
+    public function decreaseItem($id)
+    {
+        try {
+            $orderItem = OrderItem::findOrFail($id);
+            $order = $orderItem->order;
+
+            if ($orderItem->quantity > 1) {
+                $orderItem->decrement('quantity');
+                $orderItem->product->increment('stock');
+            } else {
+                $orderItem->product->increment('stock', $orderItem->quantity);
+                $orderItem->delete();
+            }
+
+            if ($order->orderItems()->count() === 0) {
+                $order->delete();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order deleted as it became empty!',
+                    'cartCount' => 0,
+                ]);
+            }
+
+            $order->update([
+                'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Quantity decreased successfully!',
+                'cartCount' => $order->orderItems()->sum('quantity'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while decreasing the item quantity.',
+            ], 500);
+        }
+    }
+
+
+
     public function myOrders()
     {
         $orders = Order::where('user_id', Auth::id())
@@ -116,93 +196,6 @@ class OrderController extends Controller
         $totalOrdersPrice = $orders->sum('total_price');
         return view('orders.my-purchases',  ['orders' => $orders, 'totalOrdersPrice' => $totalOrdersPrice]);
     }
-    public function removeItem($id)
-    {
-        try {
-            $orderItem = OrderItem::findOrFail($id);
-            $order = $orderItem->order;
-
-            // زيادة المخزون بالكميات المحذوفة
-            $orderItem->product->increment('stock', $orderItem->quantity);
-
-            // حذف العنصر من الطلب
-            $orderItem->delete();
-
-            // التحقق مما إذا كان الطلب فارغًا بعد الحذف
-            if ($order->orderItems()->count() === 0) {
-                $order->delete();
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Order deleted as it became empty!',
-                    'cartCount' => 0, // لا يوجد عناصر في السلة
-                    'totalPrice' => 0
-                ]);
-            }
-
-            // تحديث إجمالي السعر للطلب بعد حذف العنصر
-            $order->update([
-                'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Product removed successfully!',
-                'cartCount' => $order->orderItems()->sum('quantity'),
-                'totalPrice' => $order->total_price, // ✅ إرسال السعر الجديد للواجهة
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while removing the item.',
-            ], 500);
-        }
-    }
-
-    public function decreaseItem($id)
-    {
-        try {
-            $orderItem = OrderItem::findOrFail($id);
-            $order = $orderItem->order;
-
-            if ($orderItem->quantity > 1) {
-                // تقليل الكمية بمقدار 1 وإعادة المخزون
-                $orderItem->decrement('quantity');
-                $orderItem->product->increment('stock');
-            } else {
-                // إذا كانت الكمية 1، حذف العنصر وزيادة المخزون
-                $orderItem->product->increment('stock', $orderItem->quantity);
-                $orderItem->delete();
-            }
-
-            // التحقق مما إذا كان الطلب فارغًا بعد الحذف
-            if ($order->orderItems()->count() === 0) {
-                $order->delete();
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Order deleted as it became empty!',
-                    'cartCount' => 0, // لا يوجد عناصر في السلة
-                ]);
-            }
-
-            // تحديث إجمالي السعر للطلب إذا لم يُحذف
-            $order->update([
-                'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Quantity decreased successfully!',
-                'cartCount' => $order->orderItems()->sum('quantity'),
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while decreasing the item quantity.',
-            ], 500);
-        }
-    }
-
-
 
 
     public function getOrders(Request $request)
@@ -288,7 +281,7 @@ class OrderController extends Controller
     public function create()
     {
         $users = User::all(); // Fetch all users
-        return view('orders.create',['users'=>$users]);
+        return view('orders.create', ['users' => $users]);
     }
 
     /**
@@ -300,13 +293,13 @@ class OrderController extends Controller
             'user_id' => 'required|exists:users,id',
             'status' => 'required|in:pending,completed',
         ]);
-    
+
         $order = Order::create([
             'user_id' => $request->user_id,
-            'total_price' =>$request->input('total_price'),
+            'total_price' => $request->input('total_price'),
             'status' => $request->status,
         ]);
-    
+
         return redirect()->route('orders.index')->with('success', 'Order created successfully!');
     }
 
@@ -324,7 +317,7 @@ class OrderController extends Controller
     public function edit(Order $order)
     {
         $users = User::all();
-        return view('orders.edit', ['order' => $order,'users'=>$users]);
+        return view('orders.edit', ['order' => $order, 'users' => $users]);
     }
 
     /**
@@ -336,13 +329,13 @@ class OrderController extends Controller
             'user_id' => 'required|exists:users,id',
             'status' => 'required|in:pending,completed',
         ]);
-    
+
         $order->update([
             'user_id' => $request->user_id,
-            'total_price' =>$request->input('total_price'),
+            'total_price' => $request->input('total_price'),
             'status' => $request->status,
         ]);
-    
+
         return redirect()->route('orders.index')->with('success', 'Order updated successfully!');
     }
 
@@ -355,86 +348,4 @@ class OrderController extends Controller
 
         return back()->with('delete', 'Your Order was deleted!');
     }
-
-        // // 1️⃣ الطلبات خلال آخر 7 أيام
-        // public function ordersLast7Days(Request $request)
-        // {
-        //     if ($request->ajax()) {
-        //         $orders = Order::where('created_at', '>=', now()->subDays(7))
-        //                        ->orderBy('created_at', 'desc')
-        //                        ->select(['id', 'user_id', 'total_price', 'status', 'created_at']);
-    
-        //         return DataTables::of($orders)
-        //             ->addColumn('user', function ($order) {
-        //                 return $order->user->name;
-        //             })
-        //             ->make(true);
-        //     }
-        //     return view('reports.orders_last_7_days');
-        // }
-    
-        // // 2️⃣ إجمالي المبيعات لكل منتج في آخر 30 يومًا
-        // public function salesLast30Days(Request $request)
-        // {
-        //     if ($request->ajax()) {
-        //         $sales = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
-        //                           ->join('products', 'order_items.product_id', '=', 'products.id')
-        //                           ->where('orders.created_at', '>=', now()->subDays(30))
-        //                           ->select('products.id as product_id', 'products.name', DB::raw('SUM(order_items.quantity) as total_sold'))
-        //                           ->groupBy('products.id', 'products.name');
-    
-        //         return DataTables::of($sales)->make(true);
-        //     }
-        //     return view('reports.sales_last_30_days');
-        // }
-    
-        // // 3️⃣ أفضل 5 عملاء حسب إجمالي الإنفاق
-        // public function top5Customers(Request $request)
-        // {
-        //     if ($request->ajax()) {
-        //         $customers = Order::join('users', 'orders.user_id', '=', 'users.id')
-        //                           ->select('users.id as user_id', 'users.name', DB::raw('SUM(orders.total_price) as total_spent'))
-        //                           ->groupBy('users.id', 'users.name')
-        //                           ->orderByDesc('total_spent')
-        //                           ->limit(5);
-    
-        //         return DataTables::of($customers)->make(true);
-        //     }
-        //     return view('reports.top_5_customers');
-        // }
-    
-        // // 4️⃣ الطلبات التي تحتوي على أكثر من 3 منتجات مختلفة
-        // public function ordersMoreThan3Products(Request $request)
-        // {
-        //     if ($request->ajax()) {
-        //         $orders = Order::whereHas('orderItems', function ($query) {
-        //                     $query->select('order_id')
-        //                           ->groupBy('order_id')
-        //                           ->havingRaw('COUNT(DISTINCT product_id) > 3');
-        //                 })
-        //                 ->select(['id', 'user_id', 'total_price', 'status', 'created_at']);
-    
-        //         return DataTables::of($orders)
-        //             ->addColumn('user', function ($order) {
-        //                 return $order->user->name;
-        //             })
-        //             ->make(true);
-        //     }
-        //     return view('reports.orders_more_than_3_products');
-        // }
-    
-        // // 5️⃣ قائمة المنتجات التي تم شراؤها لكل طلب
-        // public function orderProducts(Request $request)
-        // {
-        //     if ($request->ajax()) {
-        //         $orderProducts = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
-        //                                   ->join('products', 'order_items.product_id', '=', 'products.id')
-        //                                   ->select('orders.id as order_id', DB::raw('GROUP_CONCAT(products.name SEPARATOR ", ") as products_list'))
-        //                                   ->groupBy('orders.id');
-    
-        //         return DataTables::of($orderProducts)->make(true);
-        //     }
-        //     return view('reports.order_products');
-        // }
-    
 }

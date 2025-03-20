@@ -1,4 +1,4 @@
-<x-table-layout title="Orders "> 
+<x-table-layout title="Orders ">
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1>Orders </h1>
@@ -21,24 +21,43 @@
 </x-table-layout>
 
 <script type="text/javascript">
-    $(function () {
+    $(function() {
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('orders.index') }}",
-            columns: [
-                {data: 'id', name: 'id'},
-                {data: 'user_name', name: 'user_name'},
-                {data: 'total_price', name: 'total_price'},
-                {data: 'status', name: 'status'},
-                {data: 'created_at', name: 'created_at'},
-                {data: 'action', name: 'action', orderable: false, searchable: false}
+            columns: [{
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'user_name',
+                    name: 'user_name'
+                },
+                {
+                    data: 'total_price',
+                    name: 'total_price'
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
             ]
         });
     });
 
     // DELETE WITH SWAL
-    $(document).on("click", ".delete-btn", function (e) {
+    $(document).on("click", ".delete-btn", function(e) {
         e.preventDefault();
         var form = $(this).closest("form");
         Swal.fire({
@@ -57,8 +76,8 @@
     });
 
     // SWEET ALERT SUCCESS MESSAGE
-    $(document).ready(function () {
-        @if(session('delete'))
+    $(document).ready(function() {
+        @if (session('delete'))
             Swal.fire({
                 toast: true,
                 position: 'bottom-end',
@@ -70,7 +89,7 @@
         @endif
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         let successMessage = sessionStorage.getItem('successMessage');
         if (successMessage) {
             Swal.fire({
@@ -85,7 +104,7 @@
         }
     });
 
-    @if(session('success'))
+    @if (session('success'))
         sessionStorage.setItem('successMessage', "{{ session('success') }}");
     @endif
 </script>
