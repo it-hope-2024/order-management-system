@@ -28,13 +28,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale()], function () {
                 return response()->json(['success' => true]);
             });
         });
-    // Route::get('/notifications', function () {
-    //     return response()->json(Auth::user()->unreadNotifications);
-    // })->middleware(['auth','admin']);
-    // Route::post('/notifications/mark-as-read', function () {
-    //     Auth::user()->unreadNotifications->markAsRead();
-    //     return response()->json(['success' => true]);
-    // })->middleware(['auth','admin']);
+
 
     //Orders Routes
     Route::prefix('orders')->group(function () {

@@ -167,62 +167,7 @@
 <script>
     window.IsAdmin = @json(auth()->check() ? auth()->user()->is_admin : false);
 
-    // document.addEventListener("DOMContentLoaded", function() {
-    //     function fetchNotifications() {
-    //         fetch('/notifications', {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     "X-Requested-With": "XMLHttpRequest"
-    //                 }
-    //             })
-    //             .then(response => response.json())
-    //             .then(data => {
-    //                 let notificationList = document.getElementById("notification-list");
-    //                 let notificationCount = document.getElementById("notification-count");
-
-    //                 notificationList.innerHTML = "";
-
-    //                 if (data.length === 0) {
-    //                     notificationList.innerHTML =
-    //                         '<div class="p-2 text-gray-500">No Notifications</div>';
-    //                     notificationCount.classList.add("hidden");
-    //                 } else {
-    //                     notificationCount.classList.remove("hidden");
-    //                     notificationCount.innerText = data.length;
-
-    //                     data.forEach(notification => {
-    //                         let notificationItem = document.createElement("div");
-    //                         notificationItem.classList.add("p-2", "border-b");
-    //                         notificationItem.textContent = notification.data.message;
-    //                         notificationList.appendChild(notificationItem);
-    //                     });
-    //                 }
-    //             })
-    //             .catch(error => console.error("Error In Extracting Notifications:", error));
-    //     }
-
-    //     fetchNotifications();
-
-    //     document.getElementById("notifications-btn").addEventListener("click", function() {
-    //         let dropdown = document.getElementById("notification-dropdown");
-    //         let notificationCount = document.getElementById("notification-count");
-
-    //         dropdown.classList.toggle("hidden");
-
-    //         if (!dropdown.classList.contains("hidden")) {
-    //             notificationCount.classList.add("hidden");
-
-    //             fetch('/notifications/mark-as-read', {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
-    //                         .getAttribute("content")
-    //                 }
-    //             }).catch(error => console.error("Error In Updating Notifications", error));
-    //         }
-    //     });
-    // });
+ 
 
     document.addEventListener("DOMContentLoaded", function () {
     // Check if user is admin before fetching notifications
