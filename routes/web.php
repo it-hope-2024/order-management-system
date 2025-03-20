@@ -15,6 +15,27 @@ Route::group(['prefix' => LaravelLocalization::setLocale()], function () {
     Route::get('/products/list', [ProductController::class, 'getProducts'])->name('products.list');
     Route::resource('products', ProductController::class);
 
+        //For notifications Routes
+        Route::middleware(['auth', 'admin'])->group(function () {
+            // Route to get unread notifications
+            Route::get('/notifications', function () {
+                return response()->json(Auth::user()->unreadNotifications);
+            });
+        
+            // Route to mark notifications as read
+            Route::post('/notifications/mark-as-read', function () {
+                Auth::user()->unreadNotifications->markAsRead();
+                return response()->json(['success' => true]);
+            });
+        });
+    // Route::get('/notifications', function () {
+    //     return response()->json(Auth::user()->unreadNotifications);
+    // })->middleware(['auth','admin']);
+    // Route::post('/notifications/mark-as-read', function () {
+    //     Auth::user()->unreadNotifications->markAsRead();
+    //     return response()->json(['success' => true]);
+    // })->middleware(['auth','admin']);
+
     //Orders Routes
     Route::prefix('orders')->group(function () {
         Route::post('add-to-cart/{product}', [OrderController::class, 'addToCart'])->name('orders.add-to-cart');

@@ -163,6 +163,4 @@ function showAuthAlert() {
 
 
 
-
-
 </script>

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DB;
 use App\Models\User;
+use App\Notifications\OrderNotification;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Yajra\DataTables\DataTables;
@@ -67,6 +68,7 @@ class OrderController extends Controller implements HasMiddleware
                 'total_price' => $order->orderItems->sum(fn($item) => $item->quantity * $item->price_at_purchase),
             ]);
 
+ 
             return response()->json([
                 'success' => true,
                 'message' => 'Product added successfully!',
@@ -91,6 +93,10 @@ class OrderController extends Controller implements HasMiddleware
 
         $order->update(['status' => 'completed']);
 
+        $adminUsers = User::where('is_admin', true)->get();
+        foreach ($adminUsers as $admin) {
+            $admin->notify(new OrderNotification('User ' . Auth::user()->name . ' confirmed an order (ID: ' . $order->id . ').'));
+        }
         return response()->json(['success' => true, 'message' => 'Order has Been Confirmed Successfully', 'cartCount' => 0]);
     }
 
